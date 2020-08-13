@@ -1,5 +1,9 @@
 <?php
 
+function is_debug(){
+    return file_exists("debug.lock");
+}
+
 function double_formatter($amount, $minor_units)
 {
     $amount = strval($amount);

@@ -74,6 +74,7 @@ if (isset($_SESSION["id"])) {
                                             $id = add_user($_POST["login"], $_POST["password"], $_POST["currency"], $cfg);
 
                                             if ($id) {
+                                                add_free_rounds($id, 20, $cfg); // даем новым пользователям 20 бесплатных вращений
                                                 user_login($id, $cfg);
                                                 header("Location: index.php");
                                             } else {

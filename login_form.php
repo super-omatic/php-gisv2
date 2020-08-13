@@ -48,7 +48,7 @@ if (isset($_SESSION["id"])) {
 
                             // если мы заходим в систему - закроем активную игровую сессию,
                             // чтобы избежать списаний в другом браузере и/или на другом устройстве
-                            close_current_session($row['id'], $cfg);
+                            close_current_session($row['id'],"STOPPED", $cfg);
 
                             user_login($row['id'], $cfg);
 

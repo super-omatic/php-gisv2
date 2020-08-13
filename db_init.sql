@@ -5,7 +5,7 @@ USE gis_2;
 create table game_sessions
 (
     id                  varchar(64)                 not null,
-    status              ENUM('NEW', 'CHECKED', 'ACTIVE', 'CLOSED', 'ERROR') not null,
+    status              ENUM('NEW', 'CHECKED', 'ACTIVE', 'STOPPED', 'CLOSED', 'ERROR') not null,
     user_id             int                         not null,
     startAmount         int                         null,
     balance             int         default 0       not null,
@@ -37,10 +37,23 @@ create table transactions
 (
     id              varchar(64)                             not null,
     type            ENUM('UNKNOWN', 'WITHDRAW', 'DEPOSIT')  not null,
-    flag            ENUM('NORMAL', 'CANCELED', 'COMPLETED') not null,
+    flag            ENUM('NORMAL', 'FREEROUNDS', 'CANCELED') not null,
     amount          int                                     not null,
-    date     timestamp   default current_timestamp() not null,
+    date            timestamp   default current_timestamp() not null,
     session         varchar(64)                             null,
+
+    PRIMARY KEY (`id`)
+);
+
+create table free_rounds
+(
+    id              varchar(64)   not null,
+    game_session_id varchar(64)   null,
+    status          ENUM('NEW', 'ACTIVE', 'COMPLETED', 'VOIDED') not null,
+    user_id         int           not null,
+    played          int default 0 not null,
+    total           int           not null,
+    date            timestamp     default current_timestamp() not null,
 
     PRIMARY KEY (`id`)
 );

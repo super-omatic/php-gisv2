@@ -46,24 +46,10 @@ function gis_filter_for_sign($param)
  * @param $requestParams - параметры полученные в запросе
  * @param $method - метод который обратился за подписью
  * @param $cfg - глобальный настройки
- * @return bool
+ * @return string - подпись
  */
-function gis_check_sign($requestParams, $method, $cfg)
+function make_sign($requestParams, $method, $cfg)
 {
-    // проверяем подпись
-    // получим подпись запроса
-    $sign = null;
-    if (isset($requestParams["sign"])) {
-        $sign = $requestParams["sign"];
-    } else {
-        // подпись не найдена
-        return false;
-    }
-    if ($sign == null || !is_string($sign) || empty($sign)) {
-        // подпись не строка
-        return false;
-    }
-
     // получим только параметры необходимые для вычисления подписи
     // для версий PHP >=5.6
     // $params = array_filter($requestParams, "gis_filter_for_sign", ARRAY_FILTER_USE_KEY);
@@ -89,11 +75,37 @@ function gis_check_sign($requestParams, $method, $cfg)
     $signString = $joined . "&" . $method . "&" . $cfg["partner.alias"] . "&" . $cfg["secretKey"];
 
     // получим md5 хеш
-    $md5 = md5($signString);
+    return md5($signString);
+}
+
+/**
+ * Проверка подписи
+ * @param $requestParams - параметры полученные в запросе
+ * @param $method - метод который обратился за подписью
+ * @param $cfg - глобальный настройки
+ * @return bool
+ */
+function gis_check_sign($requestParams, $method, $cfg)
+{
+    // проверяем подпись
+    // получим подпись запроса
+    $sign = null;
+    if (isset($requestParams["sign"])) {
+        $sign = $requestParams["sign"];
+    } else {
+        // подпись не найдена
+        return false;
+    }
+    if ($sign == null || !is_string($sign) || empty($sign)) {
+        // подпись не строка
+        return false;
+    }
+
+    $md5 = make_sign($requestParams, $method, $cfg);
 
     // проверяем подпись без учета регистра
     if (strcasecmp($md5, $sign) <> 0) {
-        gis_write_error($signString, $cfg);
+        //gis_write_error($signString, $cfg);
         // подпись не совпала
         return false;
     }
@@ -110,6 +122,34 @@ function gis_init($requestParams, $cfg)
 {
     // получение ответа в виде JSON строки
     $result = gis_request("init.session", "POST", $requestParams, $cfg);
+
+    // проверим правильность ответа и преобразуем его в массив
+    return gis_process_response($result, $cfg);
+}
+
+/**
+ * Принудительное закрытие сессии на Платформе
+ * @param $requestParams
+ * @param $cfg
+ * @return array|false
+ */
+function gis_close_session($requestParams, $cfg){
+    // получение ответа в виде JSON строки
+    $result = gis_request("close.session", "POST", $requestParams, $cfg);
+
+    // проверим правильность ответа и преобразуем его в массив
+    return gis_process_response($result, $cfg);
+}
+
+/**
+ * Получение информации по фрираундам
+ * @param $requestParams
+ * @param $cfg
+ * @return array|false
+ */
+function gis_freerounds_info($requestParams, $cfg){
+    // получение ответа в виде JSON строки
+    $result = gis_request("games.freeroundsInfo", "POST", $requestParams, $cfg);
 
     // проверим правильность ответа и преобразуем его в массив
     return gis_process_response($result, $cfg);

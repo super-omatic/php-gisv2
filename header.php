@@ -58,12 +58,37 @@
 
 <!-- Баланс пользователя -->
 <span class="p-1 text-center ml-2" id="userCreditBalance">Balance: <?php
-    // todo брать minor_units для валют из /currencies.list
     echo double_formatter(intval(intval($_SESSION["balance"]) * 100) / intval($_SESSION["denomination"]), 2)
     ?></span><span class="p-1 text-center mr-2" id="userBalance">(<?php
-    // todo брать minor_units для валют из /currencies.list
     echo double_formatter($_SESSION["balance"], 2) . " " . $_SESSION["currency"]
     ?>)</span>
+
+<?php
+if($cfg["isProduction"]){
+    ?>
+    <!-- Количество фрираундов -->
+    <span id="lb-fr-count">FreeRounds: <span class="mr-1" id="fr-count">0</span></span>
+    <?php
+}else {
+    ?>
+    <!-- Добавить кредитов -->
+    <a class="btn btn-outline-primary mr-1" href="#" onclick="addCredits(); return false;">Add
+        100<?php echo $_SESSION["currency"]; ?></a>
+
+    <!-- Количество фрираундов -->
+    <a class="btn btn-outline-primary mr-1" href="#" onclick="addFreeRounds(1); return false;">FR:<span
+                id="fr-count">0</span>+</a>
+
+    <!-- Включить/выключить дебаг -->
+    <a class="btn btn-outline-primary mr-1" href="#" onclick="toggleDebug(); return false;">Debug: <span
+                id="lb-debug"><?php if(is_debug())echo "on"; else echo "off" ?></span></a>
+    <?php
+}
+?>
+
+<script>
+    addFreeRounds(0);
+</script>
 
 <!-- Выход -->
 <a class="btn btn-outline-primary" href="user_logout.php">Logout</a>

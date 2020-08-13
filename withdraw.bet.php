@@ -2,6 +2,7 @@
 include_once "config.php";
 include_once "gis_api.php";
 include_once "db.php";
+include_once "utils.php";
 
 //gis_write_error("withdraw.bet", $cfg);
 // получим данные от Платформы
@@ -37,6 +38,18 @@ if (is_array($data) && isset($data["session"]) && $data["session"]) {
     $response = "cannot process value session";
 }
 header('Content-Type: application/json');
+
+// Эмуляция случайной ошибки
+if (is_debug() && rand(0, 99) < 10) {
+    if (rand(0, 9) < 5) {
+        gis_write_error("withdraw.bet - random 500 err", $cfg);
+        http_response_code(500);
+    } else {
+        gis_write_error("withdraw.bet - random sleep err", $cfg);
+        sleep(3);
+    }
+}
+
 //gis_write_error(json_encode($response), $cfg);
 if (is_array($response)) {
     // списание с баланса успешно
